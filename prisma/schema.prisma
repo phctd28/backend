@@ -1,0 +1,159 @@
+// schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Doctor {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  fullname        String
+  specialization  String
+  email           String   @unique
+  phone           String   @unique
+  password        String
+  gender          String
+  profileImage    String
+  qualification   DoctorQualification[]
+  registrationNumber String
+  description     String
+  experience      Int
+  availability    String[]
+  consultationfee Int
+ 
+  address         String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  appointments    Appointment[]
+  hospitalId      String[]   @db.ObjectId
+  hospital        Hospital? @relation(fields: [hospitalId], references: [id])
+
+  @@map("doctors")
+}
+
+
+type DoctorQualification {
+  degree          String    // BSc Nursing, GNM, etc.
+  institution     String
+  yearCompleted   Int
+  registrationNumber String
+  validUntil      DateTime?
+}
+
+model Patient {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  fullname       String
+  age            Int
+  gender         String
+  email          String   @unique
+  phone          String   @unique
+  password       String
+  profileImage   String
+  bloodGroup     String   
+  address        String
+  medicalHistory String[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  appointments   Appointment[]
+  documents      Document[]     // Medical documents/reports
+  reviews        Review[]
+
+  @@map("patients")
+}
+
+model Appointment {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  doctorId        String   @db.ObjectId
+  patientId       String   @db.ObjectId
+  appointmentDate DateTime
+  description     String?
+  status          String   @default("pending")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  doctor          Doctor   @relation(fields: [doctorId], references: [id])
+  patient         Patient  @relation(fields: [patientId], references: [id])
+
+  @@map("appointments")
+}
+model NursingStaff {
+  id                String    @id @default(auto()) @map("_id") @db.ObjectId
+  fullname         String
+  registrationNumber String   @unique  // Nursing Council Registration Number
+  email            String    @unique
+  phone            String    @unique
+  password         String
+  gender           String
+  dateOfBirth      DateTime
+  profileImage     String?
+  qualification    NursingQualification[]
+  specialization   String[]  // e.g., ICU, Pediatric, Emergency
+  experience       Int       // Years of experience
+  currentEmployment String
+  languages        String[]  // Languages spoken
+  address          String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  @@map("nursingstaff")
+}
+
+type NursingQualification {
+  degree          String    // BSc Nursing, GNM, etc.
+  institution     String
+  yearCompleted   Int
+  registrationNumber String
+  validUntil      DateTime?
+}
+
+
+model Document {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  patientId   String   @db.ObjectId
+  type        String   // Lab Report, X-Ray, Prescription, etc.
+  title       String
+  fileUrl     String
+  uploadDate  DateTime @default(now())
+  notes       String?
+  uploadedBy  String   // Doctor or staff name
+  isArchived  Boolean  @default(false)
+
+  patient     Patient  @relation(fields: [patientId], references: [id])
+
+  @@map("documents")
+}
+
+model Hospital {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String   @unique
+  address     String
+  email       String   
+  phone       String[]  
+  website     String?
+  description String?
+  specialties String[]
+  facilities  String[]
+  images      String[]
+  rating      Float?   @default(0)
+  reviews     Review[]
+  doctors     Doctor[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Review {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  rating      Float
+  comment     String?
+  hospitalId  String   @db.ObjectId
+  patientId   String   @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  hospital    Hospital @relation(fields: [hospitalId], references: [id])
+  patient     Patient  @relation(fields: [patientId], references: [id])
+}

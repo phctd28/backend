@@ -1,0 +1,20 @@
+API Documentation
+
+Doctor Endpoints
+
+MethodEndpointDescription
+POST/api/doctorsCreate a new doctor
+GET/api/doctors Get all doctorsGET/api/doctors/:id  Get a specific doctor by ID
+PUT/api/doctors/:id Update a doctor's information
+DELETE/api/doctors/:id  Delete a doctor
+GET/api/doctors/search/specialization?specialization=value  Search doctors by specialization
+
+Patient Endpoints
+
+MethodEndpointDescription
+POST/api/patients Create a new patient
+GET/api/patients Get all patients 
+GET/api/patients/:id Get a specific patient by ID
+PUT/api/patients/:id  Update a patient's information
+DELETE/api/patients/:id  Delete a patient
+GET/api/patients/search/condition?condition=value  Search patients by medical condition
